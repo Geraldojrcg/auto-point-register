@@ -28,7 +28,7 @@ module.exports = {
     try {
       console.log("Starting point register");
       const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
       });
       const page = await browser.newPage();
       await page.goto(process.env.SITE_LOGIN_URL);
