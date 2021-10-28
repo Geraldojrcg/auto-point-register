@@ -15,7 +15,7 @@ async function handleLogin(page) {
   }
 }
 
-async function registerPoint(page, xpath) {
+async function handleRegisterPoint(page, xpath) {
   const [button] = await page.$x(xpath);
   if (button) {
     await Promise.all([button.click(), page.waitForTimeout(2000)]);
@@ -26,7 +26,6 @@ async function registerPoint(page, xpath) {
 module.exports = {
   registerPoint: async () => {
     try {
-      console.log("Starting point register");
       const browser = await puppeteer.launch({
         headless: true,
       });
@@ -42,16 +41,14 @@ module.exports = {
         await page.waitForXPath(xpath, {
           visible: true,
         });
-        const pointRegistered = await registerPoint(page, xpath);
+        const pointRegistered = await handleRegisterPoint(page, xpath);
         if (pointRegistered) {
           await telegranBot.sendSuccessMessage();
         }
       }
       await browser.close();
-      console.log("End point register");
     } catch (error) {
-      console.error(error);
-      await telegranBot.sendErrorMessage();
+      await telegranBot.sendErrorMessage(error);
     }
   },
 };

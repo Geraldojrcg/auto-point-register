@@ -14,7 +14,9 @@ module.exports = {
   sendSuccessMessage: async () => {
     return await sendMessage(`Point registered at: ${getDate()}`);
   },
-  sendErrorMessage: async () => {
-    return await sendMessage(`Failed to register the point at: ${getDate()}`);
+  sendErrorMessage: async (error) => {
+    return await sendMessage(
+      `Failed to register the point at: ${getDate()} \n Error: ${error}`
+    );
   },
 };
