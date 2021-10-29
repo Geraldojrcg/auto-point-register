@@ -5,7 +5,7 @@ const siteAutomation = require("./site-automation");
 module.exports = {
   createSchedule: async () => {
     cron.schedule(
-      "0 8,12,13,17 * * *",
+      "0 8,12,13,17 * * 1-5",
       async () => {
         const date = new Date();
         const holidayList = await holidays.getHolidays(date.getFullYear());
