@@ -45,7 +45,11 @@ module.exports = {
         const pointRegistered = await handleRegisterPoint(page, xpath);
         if (pointRegistered) {
           await telegranBot.sendSuccessMessage();
+        } else {
+          await telegranBot.sendErrorMessage("Point register error");
         }
+      } else {
+        await telegranBot.sendErrorMessage("Login error");
       }
       await browser.close();
     } catch (error) {
