@@ -1,16 +1,14 @@
 const puppeteer = require("puppeteer");
 const telegranBot = require("./telegram-bot");
 
+const TIMEOUT = 1000 * 60 * 2;
+
 async function handleLogin(page) {
   await page.type("[name=login]", process.env.SITE_LOGIN_EMAIL);
   await page.type("[name=password]", process.env.SITE_LOGIN_PASSWORD);
   const [button] = await page.$x("//button[contains(., 'Entrar')]");
   if (button) {
-    await Promise.all([
-      button.click(),
-      page.waitForNavigation({ waitUntil: "networkidle0" }),
-      page.waitForNavigation({ waitUntil: "load" }),
-    ]);
+    await Promise.all([button.click(), page.waitForTimeout(TIMEOUT)]);
     return true;
   }
 }
@@ -18,7 +16,7 @@ async function handleLogin(page) {
 async function handleRegisterPoint(page, xpath) {
   const [button] = await page.$x(xpath);
   if (button) {
-    await Promise.all([button.click(), page.waitForTimeout(2000)]);
+    await Promise.all([button.click(), page.waitForTimeout(TIMEOUT)]);
     return true;
   }
 }
