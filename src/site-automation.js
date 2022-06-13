@@ -1,9 +1,10 @@
 const puppeteer = require("puppeteer");
 const telegranBot = require("./telegram-bot");
 
-const TIMEOUT = 1000 * 60 * 2;
+const TIMEOUT = 1000 * 60;
 
 async function handleLogin(page) {
+  await page.waitForSelector("title");
   await page.type("[name=login]", process.env.SITE_LOGIN_EMAIL);
   await page.type("[name=password]", process.env.SITE_LOGIN_PASSWORD);
   const [button] = await page.$x("//button[contains(., 'Entrar')]");
@@ -13,7 +14,7 @@ async function handleLogin(page) {
   }
 }
 
-async function handleRegisterPoint(page, xpath) {
+async function handleClickButton(page, xpath) {
   const [button] = await page.$x(xpath);
   if (button) {
     await Promise.all([button.click(), page.waitForTimeout(TIMEOUT)]);
@@ -36,15 +37,25 @@ module.exports = {
       ]);
       const hasLogged = await handleLogin(page);
       if (hasLogged) {
-        const xpath = "//button[contains(., 'Registrar ponto')]";
-        await page.waitForXPath(xpath, {
+        await page.waitForTimeout(TIMEOUT);
+        const lastLocation =
+          "//a[contains(., 'Utilizar localização do meu último registro')]";
+        await page.waitForXPath(lastLocation, {
           visible: true,
         });
-        const pointRegistered = await handleRegisterPoint(page, xpath);
-        if (pointRegistered) {
-          await telegranBot.sendSuccessMessage();
-        } else {
-          await telegranBot.sendErrorMessage("Point register error");
+        const lastLocationClick = await handleClickButton(page, lastLocation);
+        if (lastLocationClick) {
+          const registerxpath =
+            "//pm-button[@class='pm-btn-icon btn-register']/button[@class='pm-button pm-primary']";
+          await page.waitForXPath(registerxpath, {
+            visible: true,
+          });
+          const pointRegistered = await handleClickButton(page, registerxpath);
+          if (pointRegistered) {
+            await telegranBot.sendSuccessMessage();
+          } else {
+            await telegranBot.sendErrorMessage("Point register error");
+          }
         }
       } else {
         await telegranBot.sendErrorMessage("Login error");
